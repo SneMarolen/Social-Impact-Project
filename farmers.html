@@ -1,0 +1,122 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Farm Stories - Green Bridge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="brand">
+    <span class="brand-mark"></span>
+    <span class="brand-name">Green Bridge</span>
+  </a>
+  <div class="nav-center">
+    <div class="search-bar">
+      <input type="text" id="navSearch" placeholder="Search produce, farmers, categories" oninput="handleSearch(this.value)" />
+      <span class="search-icon">Search</span>
+      <div id="searchDropdown" class="search-dropdown hidden"></div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a href="shop.html" class="nav-link">Shop</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+    <a href="surplus.html" class="nav-link surplus-badge">Smart Surplus</a>
+    <a href="wishlist.html" class="nav-link">Wishlist <span id="wishlistCount" class="badge">0</span></a>
+    <a href="cart.html" class="nav-link">Cart <span id="cartCount" class="badge">0</span></a>
+  </div>
+  <button class="hamburger" onclick="toggleMenu()">&#9776;</button>
+</nav>
+
+<div class="mobile-menu hidden" id="mobileMenu">
+  <a href="index.html">Home</a>
+  <a href="shop.html">Shop</a>
+  <a href="farmers.html">Farm Stories</a>
+  <a href="surplus.html">Smart Surplus</a><a href="contact.html">Contact</a>
+  <a href="wishlist.html">Wishlist</a>
+  <a href="cart.html">Cart</a>
+</div>
+
+<header class="farmers-hero">
+  <div class="farmers-hero-copy">
+    <div class="section-eyebrow light-eyebrow">People behind the produce</div>
+    <h1>Real farms. Real people. Real imagery.</h1>
+    <p>Every Green Bridge farmer profile now pairs polished storytelling with real-life visuals, so the marketplace feels premium, grounded, and human.</p>
+  </div>
+</header>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <div class="section-eyebrow">Our growers</div>
+        <h2 class="section-title left-title">Farm stories from across South Africa</h2>
+      </div>
+    </div>
+    <div class="farm-story-grid" id="farmersGrid"></div>
+  </div>
+</section>
+
+<section class="section section-sand">
+  <div class="container join-banner">
+    <div>
+      <div class="section-eyebrow">Farmer onboarding</div>
+      <h2 class="section-title left-title">Want to join the marketplace?</h2>
+      <p>We help small-scale farmers create a professional storefront, publish products, and tell their story with confidence.</p>
+    </div>
+    <a href="shop.html" class="btn btn-primary">See current standards</a>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-bottom"><p>&copy; 2026 Green Bridge - For Mzansi, By Mzansi</p></div>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  function renderFarmers() {
+    const grid = document.getElementById('farmersGrid');
+    if (!grid) return;
+    grid.innerHTML = FARMERS.map(farmer => {
+      const products = PRODUCTS.filter(product => product.farmerId === farmer.id).slice(0, 3);
+      const yearsActive = 2026 - farmer.established;
+      return `
+        <article class="farm-story-card" id="farmer-${farmer.id}">
+          <div class="farm-story-media">
+            <img src="${farmer.storyImage}" alt="${farmer.name} on the farm" />
+          </div>
+          <div class="farm-story-content">
+            <div class="farm-story-topline">
+              <span>${farmer.location}</span>
+              <strong>${farmer.methodLabel}</strong>
+            </div>
+            <h3>${farmer.name}</h3>
+            <p class="farm-story-farm">${farmer.farmName} - established ${farmer.established}</p>
+            <p class="farm-story-quote">"${farmer.narrative}"</p>
+            <div class="farm-story-stats-row">
+              <span>${yearsActive} years farming</span>
+              <span>${products.length} featured products</span>
+              <span>${farmer.rating} rating</span>
+            </div>
+            <div class="farm-story-product-row">
+              ${products.map(product => `<a href="product.html?id=${product.id}" class="farm-story-product">${product.name}</a>`).join('')}
+            </div>
+            <div class="farm-story-actions">
+              <a href="shop.html" class="btn btn-primary btn-sm">Browse produce</a>
+              <a href="https://wa.me/${farmer.whatsapp.replace(/\s/g,'')}" class="btn btn-outline btn-sm" target="_blank" rel="noopener">Contact farm</a>
+            </div>
+          </div>
+        </article>
+      `;
+    }).join('');
+  }
+
+  renderFarmers();
+</script>
+</body>
+</html>

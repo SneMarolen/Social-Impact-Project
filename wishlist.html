@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wishlist - Green Bridge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="brand"><span class="brand-mark"></span><span class="brand-name">Green Bridge</span></a>
+  <div class="nav-center">
+    <div class="search-bar">
+      <input type="text" id="navSearch" placeholder="Search produce, farmers, categories" oninput="handleSearch(this.value)" />
+      <span class="search-icon">Search</span>
+      <div id="searchDropdown" class="search-dropdown hidden"></div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a href="shop.html" class="nav-link">Shop</a>
+    <a href="farmers.html" class="nav-link">Farm Stories</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+    <a href="surplus.html" class="nav-link surplus-badge">Smart Surplus</a>
+    <a href="wishlist.html" class="nav-link">Wishlist <span id="wishlistCount" class="badge">0</span></a>
+    <a href="cart.html" class="nav-link">Cart <span id="cartCount" class="badge">0</span></a>
+  </div>
+  <button class="hamburger" onclick="toggleMenu()">&#9776;</button>
+</nav>
+<div class="mobile-menu hidden" id="mobileMenu">
+  <a href="index.html">Home</a><a href="shop.html">Shop</a><a href="farmers.html">Farm Stories</a><a href="surplus.html">Smart Surplus</a><a href="contact.html">Contact</a><a href="cart.html">Cart</a>
+</div>
+
+<section class="page-hero-simple">
+  <div class="container">
+    <h1>Your Wishlist</h1>
+    <p>Saved produce stays beautifully presented and ready to add back into your basket whenever you are ready.</p>
+  </div>
+</section>
+
+<div class="wishlist-page">
+  <h1>Saved Products</h1>
+  <div id="wishlistGrid"></div>
+</div>
+
+<footer class="footer" style="margin-top:4rem">
+  <div class="footer-bottom"><p>&copy; 2026 Green Bridge - For Mzansi, By Mzansi</p></div>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  function renderWishlist() {
+    const ids = getWishlist();
+    const grid = document.getElementById('wishlistGrid');
+    if (!ids.length) {
+      grid.innerHTML = `<div class="empty-state"><div class="empty-icon">Saved</div><h3>Your wishlist is empty</h3><p>Save products you love for later</p><a href="shop.html" class="btn btn-primary">Browse Produce</a></div>`;
+      return;
+    }
+    const products = PRODUCTS.filter(p => ids.includes(p.id));
+    grid.innerHTML = `<div class="editorial-products-grid">${products.map(p => renderEditorialProductCard(p, { showFarmer: true, showDescription: false })).join('')}</div>`;
+  }
+
+  renderWishlist();
+</script>
+</body>
+</html>

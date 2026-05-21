@@ -1,0 +1,197 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shop - Green Bridge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="brand">
+    <span class="brand-mark"></span>
+    <span class="brand-name">Green Bridge</span>
+  </a>
+  <div class="nav-center">
+    <div class="search-bar">
+      <input type="text" id="navSearch" placeholder="Search produce, farmers, categories" oninput="handleSearch(this.value)" />
+      <span class="search-icon">Search</span>
+      <div id="searchDropdown" class="search-dropdown hidden"></div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a href="farmers.html" class="nav-link">Farm Stories</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+    <a href="surplus.html" class="nav-link surplus-badge">Smart Surplus</a>
+    <a href="wishlist.html" class="nav-link">Wishlist <span id="wishlistCount" class="badge">0</span></a>
+    <a href="cart.html" class="nav-link">Cart <span id="cartCount" class="badge">0</span></a>
+  </div>
+  <button class="hamburger" onclick="toggleMenu()">&#9776;</button>
+</nav>
+
+<div class="mobile-menu hidden" id="mobileMenu">
+  <a href="index.html">Home</a>
+  <a href="shop.html">Shop</a>
+  <a href="farmers.html">Farm Stories</a>
+  <a href="surplus.html">Smart Surplus</a><a href="contact.html">Contact</a>
+  <a href="wishlist.html">Wishlist</a>
+  <a href="cart.html">Cart</a>
+</div>
+
+<header class="shop-hero">
+  <div class="shop-hero-overlay"></div>
+  <div class="shop-hero-content">
+    <div class="section-eyebrow light-eyebrow">Full marketplace</div>
+    <h1>Seasonal produce, pantry staples, and farm-fresh essentials.</h1>
+    <p>Every category includes at least three products, with clean filtering, transparent farmer attribution, and rich photography throughout.</p>
+  </div>
+</header>
+
+<div class="shop-layout modern-shop-layout">
+  <aside class="sidebar">
+    <h3>Refine your basket</h3>
+
+    <div class="filter-group">
+      <h4>Category</h4>
+      <label><input type="checkbox" value="vegetables" onchange="applyFilters()"> Vegetables</label>
+      <label><input type="checkbox" value="fruit" onchange="applyFilters()"> Fruit</label>
+      <label><input type="checkbox" value="herbs" onchange="applyFilters()"> Herbs</label>
+      <label><input type="checkbox" value="grains" onchange="applyFilters()"> Grains</label>
+      <label><input type="checkbox" value="eggs" onchange="applyFilters()"> Eggs and dairy</label>
+      <label><input type="checkbox" value="meat" onchange="applyFilters()"> Meat</label>
+    </div>
+
+    <div class="filter-group">
+      <h4>Max Price</h4>
+      <input type="range" min="10" max="200" value="200" id="priceRange" oninput="applyFilters(); document.getElementById('priceVal').textContent='R'+this.value" />
+      <div class="price-display"><span>R10</span><span id="priceVal">R200</span></div>
+    </div>
+
+    <div class="filter-group">
+      <h4>Special</h4>
+      <label><input type="checkbox" id="filterOrganic" onchange="applyFilters()"> Organic only</label>
+      <label><input type="checkbox" id="filterSurplus" onchange="applyFilters()"> Surplus deals</label>
+      <label><input type="checkbox" id="filterPreorder" onchange="applyFilters()"> Pre-order</label>
+    </div>
+
+    <div class="filter-group">
+      <h4>Province</h4>
+      <label><input type="checkbox" value="Mpumalanga" onchange="applyFilters()"> Mpumalanga</label>
+      <label><input type="checkbox" value="Limpopo" onchange="applyFilters()"> Limpopo</label>
+      <label><input type="checkbox" value="KwaZulu-Natal" onchange="applyFilters()"> KwaZulu-Natal</label>
+      <label><input type="checkbox" value="Western Cape" onchange="applyFilters()"> Western Cape</label>
+      <label><input type="checkbox" value="Free State" onchange="applyFilters()"> Free State</label>
+    </div>
+
+    <span class="filter-clear" onclick="clearFilters()">Clear all filters</span>
+  </aside>
+
+  <section class="main-content">
+    <div class="shop-toolbar modern-shop-toolbar">
+      <div>
+        <span class="shop-results-count" id="resultsCount">Showing all products</span>
+        <div class="shop-pill-row" id="categorySummary"></div>
+      </div>
+      <select onchange="applySorting(this.value)">
+        <option value="default">Sort: Featured</option>
+        <option value="price-asc">Price: Low to High</option>
+        <option value="price-desc">Price: High to Low</option>
+        <option value="rating">Highest Rated</option>
+        <option value="surplus">Surplus Deals First</option>
+      </select>
+    </div>
+    <div class="editorial-products-grid" id="shopGrid"></div>
+  </section>
+</div>
+
+<footer class="footer" style="margin-top:3rem">
+  <div class="footer-bottom"><p>&copy; 2026 Green Bridge - For Mzansi, By Mzansi</p></div>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  let currentProducts = [...PRODUCTS];
+
+  function renderCategorySummary() {
+    const el = document.getElementById('categorySummary');
+    if (!el) return;
+    el.innerHTML = Object.entries(CATEGORY_META).map(([key, meta]) => {
+      const total = PRODUCTS.filter(product => product.category === key).length;
+      return `<a class="shop-summary-pill" href="shop.html?cat=${key}">${meta.label} <strong>${total}</strong></a>`;
+    }).join('');
+  }
+
+  function renderShop(products) {
+    const grid = document.getElementById('shopGrid');
+    const count = document.getElementById('resultsCount');
+    if (!products.length) {
+      grid.innerHTML = '<div class="empty-state"><div class="empty-icon">Market</div><h3>No products match your filters</h3><p>Try a different category, province, or price range.</p></div>';
+    } else {
+      grid.innerHTML = products.map(product => renderEditorialProductCard(product, { showFarmer: true, showDescription: true })).join('');
+    }
+    count.textContent = `Showing ${products.length} product${products.length !== 1 ? 's' : ''}`;
+  }
+
+  function applyFilters() {
+    const checkedValues = [...document.querySelectorAll('.sidebar input[type=checkbox][value]')].filter(input => input.checked).map(input => input.value);
+    const checkedProvinces = checkedValues.filter(value => ['Mpumalanga', 'Limpopo', 'KwaZulu-Natal', 'Western Cape', 'Free State'].includes(value));
+    const checkedCategories = checkedValues.filter(value => !checkedProvinces.includes(value));
+    const maxPrice = parseInt(document.getElementById('priceRange').value, 10);
+    const organicOnly = document.getElementById('filterOrganic').checked;
+    const surplusOnly = document.getElementById('filterSurplus').checked;
+    const preorderOnly = document.getElementById('filterPreorder').checked;
+
+    currentProducts = PRODUCTS.filter(product => {
+      const farmer = getFarmerById(product.farmerId);
+      if (checkedCategories.length && !checkedCategories.includes(product.category)) return false;
+      if (checkedProvinces.length && !checkedProvinces.includes(farmer?.province)) return false;
+      if (product.price > maxPrice) return false;
+      if (organicOnly && !product.organic) return false;
+      if (surplusOnly && !product.surplus) return false;
+      if (preorderOnly && !product.preorder) return false;
+      return true;
+    });
+
+    renderShop(currentProducts);
+  }
+
+  function applySorting(value) {
+    const sorted = [...currentProducts];
+    if (value === 'price-asc') sorted.sort((a, b) => a.price - b.price);
+    if (value === 'price-desc') sorted.sort((a, b) => b.price - a.price);
+    if (value === 'rating') sorted.sort((a, b) => b.rating - a.rating);
+    if (value === 'surplus') sorted.sort((a, b) => Number(b.surplus) - Number(a.surplus));
+    renderShop(sorted);
+  }
+
+  function clearFilters() {
+    document.querySelectorAll('.sidebar input[type=checkbox]').forEach(input => { input.checked = false; });
+    document.getElementById('priceRange').value = 200;
+    document.getElementById('priceVal').textContent = 'R200';
+    currentProducts = [...PRODUCTS];
+    renderShop(currentProducts);
+  }
+
+  renderCategorySummary();
+
+  const params = new URLSearchParams(window.location.search);
+  const cat = params.get('cat');
+  if (cat) {
+    const checkbox = document.querySelector(`.sidebar input[value="${cat}"]`);
+    if (checkbox) {
+      checkbox.checked = true;
+      applyFilters();
+    } else {
+      renderShop(PRODUCTS);
+    }
+  } else {
+    renderShop(PRODUCTS);
+  }
+</script>
+</body>
+</html>

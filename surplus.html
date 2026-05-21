@@ -1,0 +1,316 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smart Surplus Alerts - Green Bridge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .surplus-page-hero {
+      background: linear-gradient(135deg, #1a0a00 0%, #3a1500 50%, #2a0a05 100%);
+      padding: 5rem 2rem; text-align: center; position: relative; overflow: hidden;
+    }
+    .surplus-page-hero h1 {
+      font-family: var(--font-display); font-size: clamp(2.2rem,5vw,3.5rem);
+      color: var(--cream); position: relative;
+    }
+    .surplus-page-hero h1 span { color: var(--orange-alert); }
+    .surplus-page-hero p { color: rgba(250,247,240,0.7); margin: 0.75rem 0 1.5rem; font-size: 1.05rem; }
+    .countdown-wrapper {
+      display: inline-flex; align-items: center; gap: 1rem;
+      background: rgba(255,255,255,0.06); border-radius: var(--radius);
+      padding: 1rem 2rem; margin-bottom: 2rem;
+    }
+    .impact-strip {
+      background: rgba(255,255,255,0.05); display: flex;
+      justify-content: center; gap: 4rem; padding: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .impact-stat { text-align: center; color: var(--cream); }
+    .impact-num { font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; color: var(--gold); display: block; }
+    .impact-label { font-size: 0.78rem; color: rgba(250,247,240,0.6); }
+    .alert-subscribe {
+      background: rgba(224,123,57,0.12); border: 1.5px solid rgba(224,123,57,0.3);
+      border-radius: var(--radius-lg); padding: 1.5rem 2rem;
+      display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;
+      max-width: 900px; margin: 2rem auto;
+    }
+    .alert-subscribe p { flex: 1; font-size: 0.9rem; color: var(--text-mid); }
+    .alert-subscribe-form { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .alert-input {
+      padding: 0.65rem 1.1rem; border: 1.5px solid var(--cream-dark);
+      border-radius: 100px; font-size: 0.88rem;
+      font-family: var(--font-body); min-width: 220px;
+    }
+    .alert-input:focus { outline: none; border-color: var(--orange-alert); }
+    .urgency-bar {
+      height: 4px; background: var(--cream-dark); border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      overflow: hidden; margin-top: auto;
+    }
+    .urgency-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--red-urgent), var(--orange-alert));
+    }
+    .stock-warning {
+      font-size: 0.72rem; font-weight: 700; color: var(--red-urgent);
+      margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.3rem;
+    }
+    .surplus-filters {
+      display: flex; gap: 0.75rem; flex-wrap: wrap;
+      justify-content: center; padding: 1.5rem 2rem;
+      background: var(--cream-dark);
+    }
+    .filter-chip {
+      padding: 0.45rem 1.1rem; border-radius: 100px;
+      border: 1.5px solid var(--cream-dark); background: var(--white);
+      font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+    }
+    .filter-chip.active, .filter-chip:hover {
+      background: var(--orange-alert); border-color: var(--orange-alert);
+      color: var(--white); font-weight: 600;
+    }
+    .surplus-grid-section {
+      max-width: 1200px; margin: 0 auto; padding: 2rem 2rem;
+    }
+    .surplus-grid-title {
+      font-family: var(--font-display); font-size: 1.5rem;
+      color: var(--green-deep); margin-bottom: 1.25rem;
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .live-badge {
+      background: var(--red-urgent); color: #fff;
+      font-size: 0.65rem; font-weight: 700; padding: 0.2rem 0.5rem;
+      border-radius: 100px; animation: pulse 1.5s ease-in-out infinite;
+      font-family: var(--font-mono);
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .surplus-product-card {
+      background: var(--white); border-radius: var(--radius-lg);
+      overflow: hidden; box-shadow: var(--shadow-sm);
+      border: 1.5px solid rgba(224,123,57,0.25);
+      transition: transform 0.25s, box-shadow 0.25s;
+      display: flex; flex-direction: column;
+    }
+    .surplus-product-card:hover { transform: translateY(-5px); box-shadow: 0 8px 30px rgba(224,123,57,0.2); }
+    .how-surplus { background: var(--cream-dark); padding: 3rem 2rem; }
+    .how-surplus-inner { max-width: 1000px; margin: 0 auto; }
+    .how-surplus h2 { font-family: var(--font-display); font-size: 1.8rem; color: var(--green-deep); text-align: center; margin-bottom: 2rem; }
+    .how-surplus-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; }
+    .how-surplus-step { background: var(--white); border-radius: var(--radius-lg); padding: 1.75rem; text-align: center; }
+    .how-surplus-step .step-icon { font-size: 0.78rem; margin-bottom: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange-alert); font-family: var(--font-mono); }
+    .how-surplus-step h3 { font-family: var(--font-display); font-size: 1rem; color: var(--green-deep); margin-bottom: 0.5rem; }
+    .how-surplus-step p { font-size: 0.85rem; color: var(--text-mid); }
+    .subscribe-confirm {
+      background: var(--green-pale); border: 1.5px solid var(--green-light);
+      border-radius: var(--radius-sm); padding: 0.75rem 1rem;
+      color: var(--green-deep); font-size: 0.9rem; display: none;
+      margin-top: 0.5rem;
+    }
+    @media only screen and (max-width: 600px) {
+      .impact-strip { gap: 1.5rem; }
+      .alert-subscribe { flex-direction: column; }
+      .how-surplus-grid { grid-template-columns: 1fr; }
+      .surplus-filters { gap: 0.5rem; }
+    }
+    @media only screen and (max-width: 900px) {
+      .how-surplus-grid { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="brand"><span class="brand-mark"></span><span class="brand-name">Green Bridge</span></a>
+  <div class="nav-center">
+    <div class="search-bar">
+      <input type="text" id="navSearch" placeholder="Search produce, farmers, categories" oninput="handleSearch(this.value)" />
+      <span class="search-icon">Search</span>
+      <div id="searchDropdown" class="search-dropdown hidden"></div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a href="shop.html" class="nav-link">Shop</a>
+    <a href="farmers.html" class="nav-link">Farm Stories</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+    <a href="surplus.html" class="nav-link surplus-badge">Smart Surplus</a>
+    <a href="wishlist.html" class="nav-link">Wishlist <span id="wishlistCount" class="badge">0</span></a>
+    <a href="cart.html" class="nav-link">Cart <span id="cartCount" class="badge">0</span></a>
+  </div>
+  <button class="hamburger" onclick="toggleMenu()">&#9776;</button>
+</nav>
+<div class="mobile-menu hidden" id="mobileMenu">
+  <a href="index.html">Home</a><a href="shop.html">Shop</a><a href="farmers.html">Farm Stories</a><a href="surplus.html">Smart Surplus</a><a href="contact.html">Contact</a><a href="cart.html">Cart</a>
+</div>
+
+<div class="surplus-page-hero">
+  <div style="position:relative">
+    <div style="font-family:var(--font-mono);font-size:0.72rem;color:var(--orange-alert);letter-spacing:0.15em;margin-bottom:0.75rem">
+      UNIQUE FEATURE · SMART SURPLUS ALERTS
+    </div>
+    <h1>&#9889; <span>Smart Surplus</span> Deals</h1>
+    <p>When farmers have more than they can sell, you save. Less waste. More value. Real impact.</p>
+
+    <div class="countdown-wrapper">
+      <div class="countdown-label">Today's deals reset in</div>
+      <div class="countdown-grid" id="countdown"></div>
+    </div>
+  </div>
+
+  <div class="impact-strip">
+    <div class="impact-stat"><span class="impact-num">R48,210</span><span class="impact-label">Saved by consumers this month</span></div>
+    <div class="impact-stat"><span class="impact-num">2.8T</span><span class="impact-label">Food waste prevented</span></div>
+    <div class="impact-stat"><span class="impact-num">64</span><span class="impact-label">Active surplus listings</span></div>
+    <div class="impact-stat"><span class="impact-num">89%</span><span class="impact-label">Avg surplus clearance rate</span></div>
+  </div>
+</div>
+
+<div style="background:var(--cream-dark);padding:1.5rem 2rem">
+  <div class="alert-subscribe">
+    <div>
+      <strong>Get Surplus Alerts First</strong>
+      <p>Be the first to know when fresh surplus deals drop. Alerts go to early subscribers 15 minutes before public listing.</p>
+    </div>
+    <div>
+      <div class="alert-subscribe-form">
+        <input class="alert-input" type="email" id="alertEmail" placeholder="your@email.com" />
+        <button class="btn btn-gold" onclick="subscribeAlerts()">Subscribe</button>
+      </div>
+      <div class="subscribe-confirm" id="subConfirm">You're subscribed! We'll alert you first.</div>
+    </div>
+  </div>
+</div>
+
+<div class="surplus-filters">
+  <button class="filter-chip active" onclick="filterSurplus('all', this)">All Deals</button>
+  <button class="filter-chip" onclick="filterSurplus('vegetables', this)">Vegetables</button>
+  <button class="filter-chip" onclick="filterSurplus('fruit', this)">Fruit</button>
+  <button class="filter-chip" onclick="filterSurplus('herbs', this)">Herbs</button>
+  <button class="filter-chip" onclick="filterSurplus('organic', this)">Organic Only</button>
+</div>
+
+<div class="surplus-grid-section">
+  <div class="surplus-grid-title">
+    Live Surplus Listings
+    <span class="live-badge">LIVE</span>
+  </div>
+  <div class="products-grid" id="surplusGrid"></div>
+  <div id="noSurplus" class="empty-state hidden">
+    <div class="empty-icon">Live</div>
+    <h3>No surplus in this category right now</h3>
+    <p>Subscribe above to be notified the moment deals drop</p>
+  </div>
+</div>
+
+<div class="how-surplus">
+  <div class="how-surplus-inner">
+    <h2>How Smart Surplus Alerts Work</h2>
+    <div class="how-surplus-grid">
+      <div class="how-surplus-step">
+        <div class="step-icon">Step 1</div>
+        <h3>Farmer Flags Surplus</h3>
+        <p>When a farmer has more stock than expected orders, they activate the surplus flag on their dashboard - triggering an immediate system alert.</p>
+      </div>
+      <div class="how-surplus-step">
+        <div class="step-icon">Step 2</div>
+        <h3>System Auto-Discounts</h3>
+        <p>Green Bridge automatically applies a discount tier, highlights the item across the platform, and sends alerts to subscribed consumers within seconds.</p>
+      </div>
+      <div class="how-surplus-step">
+        <div class="step-icon">Step 3</div>
+        <h3>Consumer Saves, Waste Prevented</h3>
+        <p>You get affordable fresh produce. The farmer clears their stock. Food that would have been wasted is now feeding families.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-bottom"><p>&copy; 2026 Green Bridge - For Mzansi, By Mzansi</p></div>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  function updateCountdown() {
+    const now = new Date();
+    const midnight = new Date(now); midnight.setHours(24,0,0,0);
+    let diff = Math.floor((midnight - now) / 1000);
+    const h = Math.floor(diff / 3600); diff %= 3600;
+    const m = Math.floor(diff / 60); const s = diff % 60;
+    const el = document.getElementById('countdown');
+    if (el) {
+      el.innerHTML = [
+        {n: String(h).padStart(2,'0'), l: 'Hours'},
+        {n: String(m).padStart(2,'0'), l: 'Mins'},
+        {n: String(s).padStart(2,'0'), l: 'Secs'}
+      ].map(b => `<div class="countdown-block"><div class="countdown-num">${b.n}</div><div class="countdown-label">${b.l}</div></div>`).join('');
+    }
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  function renderSurplusGrid(cat) {
+    const grid = document.getElementById('surplusGrid');
+    const empty = document.getElementById('noSurplus');
+    let products = PRODUCTS.filter(p => p.surplus);
+    if (cat && cat !== 'all' && cat !== 'organic') {
+      products = products.filter(p => p.category === cat);
+    } else if (cat === 'organic') {
+      products = products.filter(p => p.organic);
+    }
+    if (!products.length) {
+      grid.innerHTML = ''; empty.classList.remove('hidden'); return;
+    }
+    empty.classList.add('hidden');
+
+    grid.innerHTML = products.map(p => {
+      const farmer = FARMERS.find(f => f.id === p.farmerId) || {};
+      const discount = p.wasPrice ? Math.round((1 - p.price / p.wasPrice) * 100) : 20;
+      const stockPct = Math.min(100, Math.round((p.stock / 50) * 100));
+      const wished = isInWishlist(p.id);
+      return `
+        <div class="surplus-product-card">
+          <div class="product-img" style="position:relative">
+            <img src="${p.image}" alt="${p.name}" />
+            <span class="surplus-label">${discount}% OFF</span>
+            ${p.organic ? '<span class="organic-label">Organic</span>' : ''}
+            <span class="wishlist-btn" onclick="handleWishlist(${p.id}, this)">${wished ? '&hearts;' : '&#9825;'}</span>
+          </div>
+          <div class="product-info" style="flex:1">
+            <div class="product-farmer">${farmer.name || 'Local Farmer'}</div>
+            <div class="product-name">${p.name}</div>
+            <div class="product-location">${farmer.location || ''}</div>
+            <div class="product-price-row">
+              <span class="product-price">R${p.price}</span>
+              <span class="product-unit">/ ${p.unit}</span>
+              ${p.wasPrice ? `<span class="product-was">R${p.wasPrice}</span>` : ''}
+              <span class="product-savings">Save R${p.wasPrice ? (p.wasPrice - p.price) : Math.round(p.price * 0.25)}</span>
+            </div>
+            <div class="stock-warning">Only ${p.stock} units remaining</div>
+            <button class="add-to-cart-btn" onclick="handleAddToCart(${p.id}, this)">Add to Cart</button>
+            <div class="urgency-bar"><div class="urgency-fill" style="width:${stockPct}%"></div></div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function filterSurplus(cat, btn) {
+    document.querySelectorAll('.filter-chip').forEach(chip => chip.classList.remove('active'));
+    btn.classList.add('active');
+    renderSurplusGrid(cat);
+  }
+
+  function subscribeAlerts() {
+    const email = document.getElementById('alertEmail').value.trim();
+    if (!email.includes('@')) return alert('Please enter a valid email address.');
+    localStorage.setItem('gb_surplus_alert_email', email);
+    document.getElementById('subConfirm').style.display = 'block';
+    document.getElementById('alertEmail').value = '';
+  }
+
+  renderSurplusGrid('all');
+</script>
+</body>
+</html>

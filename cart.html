@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cart - Green Bridge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="brand"><span class="brand-mark"></span><span class="brand-name">Green Bridge</span></a>
+  <div class="nav-center">
+    <div class="search-bar">
+      <input type="text" id="navSearch" placeholder="Search produce, farmers, categories" oninput="handleSearch(this.value)" />
+      <span class="search-icon">Search</span>
+      <div id="searchDropdown" class="search-dropdown hidden"></div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a href="shop.html" class="nav-link">Shop</a>
+    <a href="farmers.html" class="nav-link">Farm Stories</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+    <a href="surplus.html" class="nav-link surplus-badge">Smart Surplus</a>
+    <a href="wishlist.html" class="nav-link">Wishlist <span id="wishlistCount" class="badge">0</span></a>
+    <a href="cart.html" class="nav-link">Cart <span id="cartCount" class="badge">0</span></a>
+  </div>
+  <button class="hamburger" onclick="toggleMenu()">&#9776;</button>
+</nav>
+<div class="mobile-menu hidden" id="mobileMenu">
+  <a href="index.html">Home</a><a href="shop.html">Shop</a><a href="farmers.html">Farm Stories</a><a href="surplus.html">Smart Surplus</a><a href="contact.html">Contact</a><a href="wishlist.html">Wishlist</a>
+</div>
+
+<section class="page-hero-simple">
+  <div class="container">
+    <h1>Your Basket</h1>
+    <p>Review your produce with the same polished product imagery and clean layout used across the rest of the marketplace.</p>
+  </div>
+</section>
+
+<div class="cart-layout" id="cartLayout"></div>
+
+<footer class="footer" style="margin-top:4rem">
+  <div class="footer-bottom"><p>&copy; 2026 Green Bridge - For Mzansi, By Mzansi</p></div>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  let promoApplied = false;
+
+  function renderCart() {
+    const cart = getCart();
+    const layout = document.getElementById('cartLayout');
+
+    if (!cart.length) {
+      layout.innerHTML = `
+        <div style="grid-column:1/-1">
+          <div class="empty-state">
+            <div class="empty-icon">Basket</div>
+            <h3>Your cart is empty</h3>
+            <p>Add some fresh produce to get started</p>
+            <a href="shop.html" class="btn btn-primary">Browse Produce</a>
+          </div>
+        </div>`;
+      return;
+    }
+
+    let subtotal = 0;
+    const items = cart.map(item => {
+      const p = PRODUCTS.find(x => x.id === item.id);
+      if (!p) return '';
+      const farmer = FARMERS.find(f => f.id === p.farmerId) || {};
+      subtotal += p.price * item.qty;
+      const discount = p.wasPrice ? Math.round((1 - p.price / p.wasPrice) * 100) : null;
+      return `
+        <div class="cart-item" id="cart-item-${p.id}">
+          <div class="cart-item-img"><img src="${p.image}" alt="${p.name}" /></div>
+          <div class="cart-item-info">
+            <div class="cart-item-name">${p.name}</div>
+            <div class="cart-item-farmer">${farmer.name} - ${farmer.location}</div>
+            ${p.surplus ? '<div style="font-size:0.78rem;color:var(--orange-alert);font-weight:600">Smart Surplus deal</div>' : ''}
+            ${discount ? `<div style="font-size:0.78rem;color:var(--orange-alert)">${discount}% off - saving R${(p.wasPrice-p.price)*item.qty}</div>` : ''}
+            <div class="cart-item-controls">
+              <button class="cart-qty-btn" onclick="changeCartQty(${p.id}, ${item.qty-1})">-</button>
+              <span style="font-weight:700">${item.qty}</span>
+              <span style="font-size:0.78rem;color:var(--text-light)">${p.unit}</span>
+              <button class="cart-qty-btn" onclick="changeCartQty(${p.id}, ${item.qty+1})">+</button>
+              <span class="remove-item" onclick="removeCartItem(${p.id})">Remove</span>
+            </div>
+          </div>
+          <div class="cart-item-price">R${(p.price * item.qty).toFixed(0)}</div>
+        </div>`;
+    }).join('');
+
+    const delivery = subtotal >= 250 ? 0 : 45;
+    const discount = promoApplied ? Math.round(subtotal * 0.1) : 0;
+    const total = subtotal + delivery - discount;
+
+    layout.innerHTML = `
+      <div class="cart-items">
+        <h1 class="cart-title">Your Basket (${cart.reduce((s,i)=>s+i.qty,0)} items)</h1>
+        ${items}
+        <div style="margin-top:1.5rem;display:flex;gap:1rem;flex-wrap:wrap">
+          <a href="shop.html" class="btn btn-outline btn-sm">Continue Shopping</a>
+          <a href="surplus.html" class="btn btn-sm" style="background:var(--orange-alert);color:#fff">Add Surplus Deals</a>
+        </div>
+      </div>
+
+      <div class="order-summary">
+        <h3>Order Summary</h3>
+        <div class="summary-row"><span>Subtotal</span><span>R${subtotal.toFixed(0)}</span></div>
+        <div class="summary-row"><span>Delivery</span><span>${delivery === 0 ? 'Free' : 'R'+delivery}</span></div>
+        ${promoApplied ? `<div class="summary-row" style="color:var(--green-mid)"><span>Promo (FRESH10)</span><span>-R${discount}</span></div>` : ''}
+        <div class="promo-row">
+          <input type="text" id="promoInput" placeholder="Promo code" value="${promoApplied ? 'FRESH10' : ''}" ${promoApplied ? 'disabled' : ''} />
+          <button class="btn btn-outline btn-sm" onclick="applyPromo()">${promoApplied ? 'Applied' : 'Apply'}</button>
+        </div>
+        <div class="summary-row total"><span>Total</span><span>R${total.toFixed(0)}</span></div>
+        ${delivery === 0 && subtotal < 250 ? '' : subtotal < 250 ? `<div style="font-size:0.8rem;color:var(--green-mid);margin-bottom:1rem">Add R${(250-subtotal).toFixed(0)} more for free delivery</div>` : ''}
+        <div style="background:var(--green-pale);border-radius:var(--radius-sm);padding:0.75rem;margin-bottom:1rem;font-size:0.82rem;color:var(--green-deep)">
+          By shopping here, you're paying <strong>directly to the farmer</strong> - no middlemen, no markup.
+        </div>
+        <a href="checkout.html" class="btn btn-primary btn-full">Proceed to Checkout</a>
+      </div>
+    `;
+  }
+
+  function changeCartQty(id, qty) {
+    updateCartQty(id, qty);
+    renderCart();
+  }
+  function removeCartItem(id) {
+    removeFromCart(id);
+    renderCart();
+  }
+  function applyPromo() {
+    const code = document.getElementById('promoInput')?.value.trim().toUpperCase();
+    if (code === 'FRESH10') { promoApplied = true; renderCart(); }
+    else alert('Invalid promo code. Try FRESH10 for 10% off!');
+  }
+
+  renderCart();
+</script>
+</body>
+</html>

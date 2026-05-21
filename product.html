@@ -1,0 +1,243 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Product - Green Bridge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="brand">
+    <span class="brand-mark"></span>
+    <span class="brand-name">Green Bridge</span>
+  </a>
+  <div class="nav-center">
+    <div class="search-bar">
+      <input type="text" id="navSearch" placeholder="Search produce, farmers, categories" oninput="handleSearch(this.value)" />
+      <span class="search-icon">Search</span>
+      <div id="searchDropdown" class="search-dropdown hidden"></div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a href="shop.html" class="nav-link">Shop</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+    <a href="surplus.html" class="nav-link surplus-badge">Smart Surplus</a>
+    <a href="wishlist.html" class="nav-link">Wishlist <span id="wishlistCount" class="badge">0</span></a>
+    <a href="cart.html" class="nav-link">Cart <span id="cartCount" class="badge">0</span></a>
+  </div>
+  <button class="hamburger" onclick="toggleMenu()">&#9776;</button>
+</nav>
+
+<div class="mobile-menu hidden" id="mobileMenu">
+  <a href="index.html">Home</a>
+  <a href="shop.html">Shop</a>
+  <a href="farmers.html">Farm Stories</a>
+  <a href="surplus.html">Smart Surplus</a><a href="contact.html">Contact</a>
+  <a href="wishlist.html">Wishlist</a>
+  <a href="cart.html">Cart</a>
+</div>
+
+<main class="product-shell" id="pageContent"></main>
+
+<footer class="footer" style="margin-top:4rem">
+  <div class="footer-bottom"><p>&copy; 2026 Green Bridge - For Mzansi, By Mzansi</p></div>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  let qty = 1;
+
+  function getHarvestPct(planted, harvest) {
+    if (!planted || !harvest) return null;
+    const plantedDate = new Date(planted);
+    const harvestDate = new Date(harvest);
+    const now = new Date();
+    if (now >= harvestDate) return 100;
+    const total = harvestDate - plantedDate;
+    const elapsed = now - plantedDate;
+    return Math.max(0, Math.min(100, Math.round((elapsed / total) * 100)));
+  }
+
+  function renderProductPage(product, farmer) {
+    const discount = product.wasPrice ? Math.round((1 - product.price / product.wasPrice) * 100) : null;
+    const wished = isInWishlist(product.id);
+    const harvestPct = getHarvestPct(product.planted, product.harvest);
+
+    return `
+      <section class="product-page">
+        <div class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span>/</span>
+          <a href="shop.html">Shop</a>
+          <span>/</span>
+          <span>${product.name}</span>
+        </div>
+
+        <div class="product-stage">
+          <div class="product-gallery">
+            <div class="product-gallery-main">
+              <img src="${product.image}" alt="${product.name}" />
+              <div class="product-badge-row">
+                ${product.surplus ? `<span class="surplus-label">Surplus ${discount ? discount + '% off' : 'deal'}</span>` : ''}
+                ${product.preorder ? '<span class="preorder-label">Pre-order</span>' : ''}
+                ${product.organic ? '<span class="organic-label">Organic</span>' : ''}
+              </div>
+            </div>
+            <div class="product-gallery-secondary">
+              <img src="${farmer.storyImage}" alt="${farmer.name} on the farm" />
+              <img src="${farmer.farmImage}" alt="${farmer.farmName}" />
+            </div>
+          </div>
+
+          <div class="product-panel">
+            <div class="product-detail-farmer">${farmer.name} - ${farmer.location}</div>
+            <h1 class="product-detail-title">${product.name}</h1>
+            <div class="product-detail-rating">${product.rating} rating from ${product.reviews} reviews</div>
+
+            <div class="product-price-row large-price-row">
+              <span class="product-detail-price">R${product.price}</span>
+              <span class="product-unit">/ ${product.unit}</span>
+              ${product.wasPrice ? `<span class="product-detail-was">R${product.wasPrice}</span>` : ''}
+            </div>
+
+            <p class="product-detail-description">${product.description}</p>
+
+            <div class="product-spec-grid">
+              <div><span>Category</span><strong>${CATEGORY_META[product.category].label}</strong></div>
+              <div><span>Origin</span><strong>${farmer.location}</strong></div>
+              <div><span>Stock</span><strong>${product.stock > 0 ? product.stock + ' available' : 'Sold out'}</strong></div>
+              <div><span>Method</span><strong>${farmer.methodLabel}</strong></div>
+            </div>
+
+            ${product.preorder ? `<div class="preorder-notice">This item is available for pre-order and is expected to dispatch on ${new Date(product.harvest).toLocaleDateString('en-ZA', { day: 'numeric', month: 'long' })}.</div>` : ''}
+            ${discount ? `<div class="product-detail-savings">You save ${discount}% on this offer.</div>` : ''}
+
+            <div class="qty-control">
+              <button class="qty-btn" onclick="changeQty(-1)">-</button>
+              <span class="qty-val" id="qtyVal">1</span>
+              <span class="qty-unit">${product.unit}</span>
+              <button class="qty-btn" onclick="changeQty(1)">+</button>
+            </div>
+
+            <div class="detail-actions">
+              <button class="btn btn-primary" onclick="handleAddToCartDetail(${product.id})" id="addBtn">${product.preorder ? 'Pre-order now' : 'Add to cart'}</button>
+              <button class="btn btn-outline" onclick="handleWishlistDetail(${product.id})" id="wishBtn">${wished ? 'Saved' : 'Save to wishlist'}</button>
+            </div>
+
+            <div class="product-support-copy">Delivery in 1 to 3 business days. Community collection is available at checkout. Every order pays farmers directly.</div>
+          </div>
+        </div>
+
+        <section class="farm-story-feature">
+          <div class="farm-story-feature-media">
+            <img src="${farmer.storyImage}" alt="${farmer.name} working on the farm" />
+          </div>
+          <div class="farm-story-feature-copy">
+            <div class="section-eyebrow light-eyebrow">The farm story</div>
+            <h2>Meet the farmer behind your food</h2>
+            <p>"${farmer.narrative}"</p>
+            <div class="farm-story-meta-grid">
+              <div><span>Farm</span><strong>${farmer.farmName}</strong></div>
+              <div><span>Established</span><strong>${farmer.established}</strong></div>
+              <div><span>Rating</span><strong>${farmer.rating} stars</strong></div>
+              <div><span>Method</span><strong>${farmer.methodLabel}</strong></div>
+            </div>
+            ${harvestPct !== null ? `
+              <div class="harvest-section">
+                <div class="harvest-title">Harvest progress</div>
+                <div class="harvest-bar-track">
+                  <div class="harvest-bar-fill" style="width:${harvestPct}%" data-pct="${harvestPct}%"></div>
+                </div>
+                <div class="harvest-dates">
+                  <span>Planted ${new Date(product.planted).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' })}</span>
+                  <span>Harvest ${new Date(product.harvest).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' })}</span>
+                </div>
+              </div>
+            ` : ''}
+            <div class="farm-story-actions">
+              <a href="farmers.html#farmer-${farmer.id}" class="btn btn-primary btn-sm">See farm profile</a>
+              <a href="https://wa.me/${farmer.whatsapp.replace(/\s/g,'')}" class="btn btn-outline btn-sm" target="_blank" rel="noopener">Contact farmer</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="product-tabs-section">
+          <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('desc', this)">Description</button>
+            <button class="tab-btn" onclick="switchTab('delivery', this)">Delivery</button>
+            <button class="tab-btn" onclick="switchTab('reviews', this)">Reviews</button>
+          </div>
+
+          <div id="tab-desc" class="tab-panel active">
+            <p>${product.description}</p>
+            <ul class="detail-list">
+              <li>Prepared for fast dispatch and packed for freshness.</li>
+              <li>Clearly linked to the farmer, province, and production method.</li>
+              <li>Designed to feel premium while staying transparent and practical.</li>
+            </ul>
+          </div>
+
+          <div id="tab-delivery" class="tab-panel">
+            <div class="delivery-grid">
+              <div><strong>Home delivery</strong><p>Flat-rate delivery with insulated packing and WhatsApp updates throughout the order journey.</p></div>
+              <div><strong>Collection points</strong><p>Community collection is available for customers who want a lower-cost pickup option.</p></div>
+              <div><strong>Freshness</strong><p>Orders are scheduled close to harvest to improve texture, flavour, and shelf life.</p></div>
+              <div><strong>Traceability</strong><p>You can see exactly which farm supplied the item before checkout.</p></div>
+            </div>
+          </div>
+
+          <div id="tab-reviews" class="tab-panel">
+            <div class="review"><div class="review-header"><span class="review-author">Thandi M.</span><span class="review-date">5/5</span></div><p class="review-text">Beautiful produce, excellent detail, and the farm imagery makes the experience feel trustworthy.</p></div>
+            <div class="review"><div class="review-header"><span class="review-author">Chef Sipho D.</span><span class="review-date">5/5</span></div><p class="review-text">The quality is restaurant-grade and the product page gives me all the information I need very quickly.</p></div>
+            <div class="review"><div class="review-header"><span class="review-author">Lerato K.</span><span class="review-date">4/5</span></div><p class="review-text">The visuals are strong and the farm story section is my favourite part of the shopping journey.</p></div>
+          </div>
+        </section>
+      </section>
+    `;
+  }
+
+  function changeQty(delta) {
+    qty = Math.max(1, qty + delta);
+    document.getElementById('qtyVal').textContent = qty;
+  }
+
+  function handleAddToCartDetail(id) {
+    addToCart(id, qty);
+    const btn = document.getElementById('addBtn');
+    const product = getProductById(id);
+    btn.textContent = `${qty} added`;
+    btn.classList.add('added');
+    setTimeout(() => {
+      btn.textContent = product.preorder ? 'Pre-order now' : 'Add to cart';
+      btn.classList.remove('added');
+    }, 1800);
+  }
+
+  function handleWishlistDetail(id) {
+    const added = toggleWishlist(id);
+    document.getElementById('wishBtn').textContent = added ? 'Saved' : 'Save to wishlist';
+  }
+
+  function switchTab(name, button) {
+    document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(tab => tab.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    button.classList.add('active');
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const id = parseInt(params.get('id'), 10) || 1;
+  const product = getProductById(id) || PRODUCTS[0];
+  const farmer = getFarmerById(product.farmerId) || FARMERS[0];
+  document.title = `${product.name} - Green Bridge`;
+  document.getElementById('pageContent').innerHTML = renderProductPage(product, farmer);
+</script>
+</body>
+</html>
+

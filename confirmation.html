@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Order Confirmed - Green Bridge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="brand"><span class="brand-mark"></span><span class="brand-name">Green Bridge</span></a>
+  <div class="nav-center">
+    <div class="search-bar">
+      <input type="text" id="navSearch" placeholder="Search produce, farmers, categories" oninput="handleSearch(this.value)" />
+      <span class="search-icon">Search</span>
+      <div id="searchDropdown" class="search-dropdown hidden"></div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a href="shop.html" class="nav-link">Shop</a>
+    <a href="farmers.html" class="nav-link">Farm Stories</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+    <a href="surplus.html" class="nav-link surplus-badge">Smart Surplus</a>
+    <a href="wishlist.html" class="nav-link">Wishlist <span id="wishlistCount" class="badge">0</span></a>
+    <a href="cart.html" class="nav-link">Cart <span id="cartCount" class="badge">0</span></a>
+  </div>
+  <button class="hamburger" onclick="toggleMenu()">&#9776;</button>
+</nav>
+<div class="mobile-menu hidden" id="mobileMenu">
+  <a href="index.html">Home</a><a href="shop.html">Shop</a><a href="farmers.html">Farm Stories</a><a href="surplus.html">Smart Surplus</a><a href="contact.html">Contact</a><a href="cart.html">Cart</a>
+</div>
+
+<div class="confirmation-page">
+  <img class="confirmation-hero-image" src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1400&q=80" alt="Fresh produce ready for delivery" />
+  <h1 class="confirmation-title">Order Confirmed</h1>
+  <p style="color:var(--text-mid);font-size:1rem">Thank you for supporting South African small-scale farmers. Your fresh produce is being prepared.</p>
+  <div class="confirmation-ref" id="refNum">GB-LOADING</div>
+  <p style="font-size:0.85rem;color:var(--text-light);margin-bottom:0.5rem">You'll receive a WhatsApp confirmation within 5 minutes</p>
+
+  <div style="background:var(--green-pale);border-radius:var(--radius-lg);padding:1.5rem;margin:1.5rem 0;text-align:left">
+    <h3 style="font-family:var(--font-display);color:var(--green-deep);margin-bottom:0.75rem">What happens next?</h3>
+    <div style="display:flex;flex-direction:column;gap:0.6rem;font-size:0.88rem;color:var(--text-mid)">
+      <div>Your order is sent to the farmer via WhatsApp or SMS</div>
+      <div>The farmer packs and dispatches within 24 hours</div>
+      <div>You receive a WhatsApp update when dispatched</div>
+      <div>Delivery arrives within 1 to 3 business days</div>
+    </div>
+  </div>
+
+  <a href="https://wa.me/27821234567" class="whatsapp-btn" target="_blank" rel="noopener">
+    Track order via WhatsApp
+  </a>
+  <div style="margin-top:1.5rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+    <a href="shop.html" class="btn btn-outline">Continue Shopping</a>
+    <a href="surplus.html" class="btn btn-primary">Check Surplus Deals</a>
+  </div>
+  <p style="margin-top:2rem;font-size:0.8rem;color:var(--text-light)">By shopping on Green Bridge, you've helped prevent food waste and paid fairly for your farmer's work.</p>
+</div>
+
+<footer class="footer" style="margin-top:4rem">
+  <div class="footer-bottom"><p>&copy; 2026 Green Bridge - For Mzansi, By Mzansi</p></div>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get('ref') || localStorage.getItem('gb_lastOrder') || 'GB-XXXXXX';
+  document.getElementById('refNum').textContent = ref;
+  updateCartCount();
+  updateWishlistCount();
+</script>
+</body>
+</html>
