@@ -1,0 +1,246 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Green Bridge - Farm-to-Consumer Marketplace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div id="surplusToast" class="surplus-toast hidden">
+  <span class="toast-icon">&#9889;</span>
+  <span class="toast-msg">New surplus deal just dropped - <strong>Mama Busi's Rainbow Chard</strong> now 40% off.</span>
+  <a href="surplus.html" class="toast-cta">Grab it</a>
+  <button class="toast-close" onclick="document.getElementById('surplusToast').classList.add('hidden')">&times;</button>
+</div>
+
+<nav class="navbar">
+  <a href="index.html" class="brand">
+    <span class="brand-mark"></span>
+    <span class="brand-name">Green Bridge</span>
+  </a>
+  <div class="nav-center">
+    <div class="search-bar">
+      <input type="text" id="navSearch" placeholder="Search produce, farmers, categories" oninput="handleSearch(this.value)" />
+      <span class="search-icon">Search</span>
+      <div id="searchDropdown" class="search-dropdown hidden"></div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a href="shop.html" class="nav-link">Shop</a>
+    <a href="farmers.html" class="nav-link">Farm Stories</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+    <a href="surplus.html" class="nav-link surplus-badge">Smart Surplus</a>
+    <a href="wishlist.html" class="nav-link">Wishlist <span id="wishlistCount" class="badge">0</span></a>
+    <a href="cart.html" class="nav-link">Cart <span id="cartCount" class="badge">0</span></a>
+  </div>
+  <button class="hamburger" onclick="toggleMenu()">&#9776;</button>
+</nav>
+
+<div class="mobile-menu hidden" id="mobileMenu">
+  <a href="index.html">Home</a>
+  <a href="shop.html">Shop</a>
+  <a href="farmers.html">Farm Stories</a>
+  <a href="surplus.html">Smart Surplus</a><a href="contact.html">Contact</a>
+  <a href="wishlist.html">Wishlist</a>
+  <a href="cart.html">Cart</a>
+</div>
+
+<header class="editorial-hero">
+  <div class="editorial-hero-copy">
+    <div class="hero-kicker">Premium local produce from verified South African farmers</div>
+    <h1>Fresh food with a modern market experience.</h1>
+    <p>Green Bridge connects households, chefs, and conscious shoppers to beautiful seasonal produce, pantry staples, and farm stories that feel personal and trustworthy.</p>
+    <div class="hero-ctas">
+      <a href="shop.html" class="btn btn-primary">Shop the marketplace</a>
+      <a href="farmers.html" class="btn btn-outline">Explore farm stories</a>
+    </div>
+    <div class="hero-metrics">
+      <div class="hero-metric">
+        <strong>18</strong>
+        <span>curated products live now</span>
+      </div>
+      <div class="hero-metric">
+        <strong>6</strong>
+        <span>categories with full assortments</span>
+      </div>
+      <div class="hero-metric">
+        <strong>24h</strong>
+        <span>farm-to-door dispatch window</span>
+      </div>
+    </div>
+  </div>
+  <div class="editorial-hero-media">
+    <div class="hero-media-card hero-media-large">
+      <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80" alt="Fresh produce arranged on a table" />
+    </div>
+    <div class="hero-media-stack">
+      <div class="hero-media-card hero-media-small">
+        <img src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=900&q=80" alt="Farmer holding vegetables in a field" />
+      </div>
+      <div class="hero-media-card hero-media-small">
+        <img src="https://images.unsplash.com/photo-1461354464878-ad92f492a5a0?auto=format&fit=crop&w=900&q=80" alt="Rows of crops on a working farm" />
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <div class="section-eyebrow">Browse by category</div>
+        <h2 class="section-title left-title">A complete market, not just a few listings</h2>
+      </div>
+      <a href="shop.html" class="see-all-link">View full shop</a>
+    </div>
+    <div class="visual-category-grid" id="homeCategories"></div>
+  </div>
+</section>
+
+<section class="section section-sand">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <div class="section-eyebrow">Fresh this week</div>
+        <h2 class="section-title left-title">Best-selling produce and pantry favourites</h2>
+      </div>
+      <a href="shop.html" class="see-all-link">Shop all products</a>
+    </div>
+    <div class="editorial-products-grid" id="featuredGrid"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container story-layout">
+    <div class="story-copy">
+      <div class="section-eyebrow">Farm story spotlight</div>
+      <h2 class="section-title left-title">Meet Mama Busi and the people behind your basket</h2>
+      <p class="story-lead">Every order should feel connected to a real place. We built Green Bridge so shoppers can see the farm, understand the method, and buy with confidence instead of guessing where their food came from.</p>
+      <div class="story-points">
+        <div class="story-point">
+          <strong>Verified origins</strong>
+          <span>Each listing is tied to a named farmer, a real province, and a transparent growing method.</span>
+        </div>
+        <div class="story-point">
+          <strong>Shorter supply chains</strong>
+          <span>Produce moves quickly from harvest to checkout, helping preserve freshness and reduce waste.</span>
+        </div>
+        <div class="story-point">
+          <strong>Better design for trust</strong>
+          <span>Imagery, product detail, and clear farm stories create a polished shopping experience that feels premium.</span>
+        </div>
+      </div>
+      <a href="farmers.html" class="btn btn-primary">Read the farm stories</a>
+    </div>
+    <div class="story-visual-grid">
+      <div class="story-visual-card tall-card">
+        <img src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=900&q=80" alt="Farmer carrying a basket of harvested vegetables" />
+      </div>
+      <div class="story-visual-card">
+        <img src="https://images.unsplash.com/photo-1461354464878-ad92f492a5a0?auto=format&fit=crop&w=900&q=80" alt="Wide view of a cultivated farm landscape" />
+      </div>
+      <div class="story-visual-card">
+        <img src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=900&q=80" alt="Hands harvesting fresh herbs" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-dark">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <div class="section-eyebrow light-eyebrow">From the community</div>
+        <h2 class="section-title left-title light-title">Why shoppers keep coming back</h2>
+      </div>
+    </div>
+    <div class="quote-grid">
+      <article class="quote-card">
+        <p>"The quality feels like a premium grocery brand, but the farm story makes it warmer and more trustworthy."</p>
+        <span>Nomsa M. - Johannesburg</span>
+      </article>
+      <article class="quote-card">
+        <p>"The site finally looks as good as the produce. I can browse categories fast and still feel connected to the farmers."</p>
+        <span>Chef Sipho D. - Rosebank</span>
+      </article>
+      <article class="quote-card">
+        <p>"Smart Surplus brought me in, but the rest of the marketplace now feels just as polished."</p>
+        <span>Lerato K. - Pretoria</span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <div class="brand"><span class="brand-mark"></span><span class="brand-name">Green Bridge</span></div>
+      <p>A modern South African farm-to-consumer marketplace built to make fresh food feel personal, premium, and fair.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Marketplace</h4>
+      <a href="shop.html">All products</a>
+      <a href="surplus.html">Smart Surplus</a><a href="contact.html">Contact</a>
+      <a href="farmers.html">Farm stories</a>
+    </div>
+    <div class="footer-links">
+      <h4>Categories</h4>
+      <a href="shop.html?cat=vegetables">Vegetables</a>
+      <a href="shop.html?cat=fruit">Fruit</a>
+      <a href="shop.html?cat=grains">Grains</a>
+    </div>
+    <div class="footer-links">
+      <h4>Support</h4>
+      <a href="cart.html">Cart</a>
+      <a href="checkout.html">Checkout</a>
+      <a href="wishlist.html">Wishlist</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Green Bridge - For Mzansi, By Mzansi</p>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  function renderHomeCategories() {
+    const el = document.getElementById('homeCategories');
+    if (!el) return;
+    el.innerHTML = Object.entries(CATEGORY_META).map(([key, meta]) => {
+      const total = PRODUCTS.filter(product => product.category === key).length;
+      return `
+        <a class="visual-category-card" href="shop.html?cat=${key}">
+          <img src="${meta.image}" alt="${meta.label} display" />
+          <div class="visual-category-overlay">
+            <span>${meta.label}</span>
+            <strong>${total} products</strong>
+          </div>
+        </a>
+      `;
+    }).join('');
+  }
+
+  function renderFeaturedHomeProducts() {
+    const el = document.getElementById('featuredGrid');
+    if (!el) return;
+    const featured = PRODUCTS.filter(product => product.featured).slice(0, 6);
+    el.innerHTML = featured.map(product => renderEditorialProductCard(product, { showFarmer: true })).join('');
+  }
+
+  renderHomeCategories();
+  renderFeaturedHomeProducts();
+
+  setTimeout(() => {
+    document.getElementById('surplusToast').classList.remove('hidden');
+  }, 3000);
+</script>
+</body>
+</html>
+
+
